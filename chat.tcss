@@ -1,0 +1,73 @@
+#header {
+    background: #a12;
+}
+#containerSession {
+    background: #848;
+    border: solid;
+}
+.previewSession {
+    border: solid;
+}
+.chatbox {
+    border: solid;
+}
+
+TextArea {
+    background: grey;
+    height: 3;
+    max-height: 80%;
+}
+
+Sidebar {
+    background: #e4e;
+    width: 32; /* check with button size */
+}
+
+#sidebar-listview {
+    height: 1fr;
+    border: solid;
+}
+
+#sidebar-button-container {
+    height: 3; /* Depends on the button size */
+}
+
+#textarea-button-container {
+    height: 3; /* Depends on the button size */
+}
+
+#new_chat {
+    width: 50%;
+}
+#new_app {
+    width: 50%;
+}
+
+
+ChatContainer {
+    background: yellow;
+    width: 1fr; /* This is really importent because the container overflows otherwise */
+}
+
+Screen {
+    layout: horizontal;
+}
+
+
+.input_error {
+    border: tall red;
+}
+
+ListItem {
+    color: $text;
+    background: $panel-lighten-1;
+}
+ListItem > Widget :hover {
+    background: $boost;
+}
+ListView > ListItem.--highlight {
+    background: $accent 50%;
+}
+ListView:focus > ListItem.--highlight {
+    background: $accent;
+}

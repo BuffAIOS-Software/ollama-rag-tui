@@ -1,0 +1,51 @@
+{
+  "last_session": "session1",
+  "sidebar_scrollpos": 0,
+  "sessions": [
+    {
+      "id": "session1",
+      "app": "testrag",
+      "scroll_pos": 0,
+      "messages": [
+        {
+          "role": "user",
+          "content": "hi from user",
+          "timestamp": "08.03.24 01:01",
+          "id": "session1-1"
+        },
+        {
+          "role": "assistant",
+          "content": "hi from bot",
+          "timestamp": "08.03.24 01:02",
+          "id": "session1-2"
+        }
+      ]
+    },
+    {
+      "id": "session2",
+      "app": "virtualassistant",
+      "scroll_pos": 0,
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a helpful assistant. When you getting ask for something, make a plan how you can answer the question correctly. If you need more information to answer the question just ask for it. Explain your reasing step by step. Your answer must be consise.",
+          "timestamp": "08.03.24 01:02",
+          "id": "session2-1"
+        }
+      ]
+    },
+    {
+      "id": "llamaindex_repo",
+      "app": "llamaindex_repo",
+      "scroll_pos": 0,
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Your name is Wurstbrot. You are an expert in python and the libary llamaindex. When you answer a question explain your reasing step by step but keep it consise.",
+          "timestamp": "01.01.24 00:00",
+          "id": "llamaindex_repo-1"
+        }
+      ]
+    }
+  ]
+}

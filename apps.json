@@ -1,0 +1,36 @@
+{
+  "apps": [
+    {
+      "id": "virtualassistant",
+      "prompt": "some prompt",
+      "model": "mistral:7b-instruct-q3_K_S",
+      "chat_app_type": {
+        "name": "chat"
+      },
+      "initial_messages": [
+        {
+          "role": "assistant",
+          "content": "How can I help you? :)"
+        }
+      ]
+    },
+    {
+      "id": "llamaindex_repo",
+      "prompt": "some prompt",
+      "model": "mistral:7b-instruct-q3_K_S",
+      "chat_app_type": {
+        "name": "rag",
+        "input_dir": "./data/llamaindex_repo",
+        "table": "asdf",
+        "vector_store_path": "./data/llamaindex_repo_db",
+        "embed_model": "nomic-embed-text"
+      },
+      "initial_messages": [
+        {
+          "role": "assistant",
+          "content": "Hi, you can ask everything about llamaindex."
+        }
+      ]
+    }
+  ]
+}
