@@ -1,8 +1,12 @@
-from datetime import datetime
 from copy import deepcopy
-from platformdirs import user_config_dir
 import os
-import json
+from util import (
+    get_app_save_dir,
+    load_data,
+    save_data,
+    generate_timestamp,
+    generate_message_ids,
+)
 
 
 class SessionManager:
@@ -129,22 +133,6 @@ class SessionManager:
         session_names = [session["id"] for session in self.sessions]
         return session_name in session_names
 
-    def generate_message_ids(self, session_name, count=1):
-        """
-        Generates unique message IDs for the given session.
-        """
-        prefix = f"{session_name}-"
-        ids = []
-        for i in range(count):
-            ids.append(f"{prefix}{i}")
-        return ids
-
-    def generate_timestamp(self):
-        """
-        Generates a timestamp for messages.
-        """
-        return datetime.now().strftime("%y.%m.%d %H:%M")
-
     def add_session(self, new_session, app):
         """
         Adds a new session with initial messages from the given app.
@@ -172,51 +160,6 @@ class SessionManager:
         self.set_current_session(new_session, "add_chat")
         self.save_sessions_to_disk()
 
-    def get_session_save_dir(self):
-        """
-        Returns the directory path for saving session data.
-        """
-        session_dir = user_config_dir("ollama-rag-tui")
-        if os.environ.get("OLLAMA-RAG-TUI-SESSION-PATH"):
-            session_dir = os.environ["OLLAMA-RAG-TUI-SESSION-PATH"]
-
-        return session_dir
-
-    def load_sessions_from_disk(self):
-        """
-        Loads session data from disk.
-        """
-        session_path = os.path.join(self.get_session_save_dir(), "session.json")
-        if not os.path.exists(session_path):
-            return
-
-        with open(session_path, "r") as session_file:
-            data = json.load(session_file)
-            self.current_session = data.get("last_session")
-            self.sidebar_scrollpos = data.get("sidebar_scrollpos")
-            self.sessions = data.get("sessions", [])
-
-    def save_sessions_to_disk(self):
-        """
-        Saves session data to disk.
-        """
-        session_dir = self.get_session_save_dir()
-        if not os.path.exists(session_dir):
-            os.makedirs(session_dir)
-
-        session_path = os.path.join(session_dir, "session.json")
-
-        with open(session_path, "w") as session_file:
-            json.dump(
-                {
-                    "last_session": self.current_session,
-                    "sidebar_scrollpos": self.sidebar_scrollpos,
-                    "sessions": self.sessions,
-                },
-                session_file,
-                indent=2,
-            )
-
     def set_current_session_scrollpos(self, current_scroll_pos):
         """
         Sets the scroll position for the current session.
@@ -236,3 +179,31 @@ class SessionManager:
             return session["scroll_pos"]
 
         return
+
+    def load_sessions_from_disk(self):
+        session_path = os.path.join(self.get_session_save_dir(), "session.json")
+        data = load_data(session_path)
+        if data:
+            self.current_session = data.get("last_session")
+            self.sidebar_scrollpos = data.get("sidebar_scrollpos")
+            self.sessions = data.get("sessions", [])
+
+    def save_sessions_to_disk(self):
+        session_path = os.path.join(self.get_session_save_dir(), "session.json")
+        save_data(
+            {
+                "last_session": self.current_session,
+                "sidebar_scrollpos": self.sidebar_scrollpos,
+                "sessions": self.sessions,
+            },
+            session_path,
+        )
+
+    def get_session_save_dir(self):
+        return get_app_save_dir("ollama-rag-tui")
+
+    def generate_timestamp(self):
+        return generate_timestamp()
+
+    def generate_message_ids(self, session_name, count=1):
+        return generate_message_ids(session_name, count)

@@ -1,6 +1,7 @@
 import json
 import os
 from platformdirs import user_config_dir
+from util import get_app_save_dir, load_data, save_data
 
 
 class ChatApp:
@@ -10,44 +11,6 @@ class ChatApp:
 
     def __init__(self):
         self.load_apps_from_disk()
-
-    def load_apps_from_disk(self):
-        """
-        Loads apps from disk.
-        """
-        apps_path = os.path.join(self.get_apps_save_dir(), "apps.json")
-        if not os.path.exists(apps_path):
-            return
-
-        with open(apps_path, "r") as apps_file:
-            self.apps = json.load(apps_file)
-
-    def get_apps_save_dir(self):
-        """
-        Returns the directory path for chat apps.
-        """
-        apps_dir = user_config_dir("ollama-rag-tui")
-        if os.environ.get("OLLAMA-RAG-TUI-APPS-PATH"):
-            apps_dir = os.environ["OLLAMA-RAG-TUI-APPS-PATH"]
-
-        return apps_dir
-
-    def save_apps_to_disk(self):
-        """
-        Saves session data to disk.
-        """
-        apps_dir = self.get_apps_save_dir()
-        if not os.path.exists(apps_dir):
-            os.makedirs(apps_dir)
-
-        apps_path = os.path.join(apps_dir, "apps.json")
-
-        with open(apps_path, "w") as apps_file:
-            json.dump(
-                self.apps,
-                apps_file,
-                indent=2,
-            )
 
     def get_chat_apps_preview(self):
         """
@@ -76,3 +39,14 @@ class ChatApp:
         Returns the chat app with the given ID.
         """
         return next((app for app in self.apps["apps"] if app["id"] == id), None)
+
+    def load_apps_from_disk(self):
+        apps_path = os.path.join(self.get_apps_save_dir(), "apps.json")
+        self.apps = load_data(apps_path) or {"apps": []}
+
+    def get_apps_save_dir(self):
+        return get_app_save_dir("ollama-rag-tui")
+
+    def save_apps_to_disk(self):
+        apps_path = os.path.join(self.get_apps_save_dir(), "apps.json")
+        save_data(self.apps, apps_path)
