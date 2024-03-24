@@ -1,40 +1,53 @@
+import json
+import os
+from platformdirs import user_config_dir
+
+
 class ChatApp:
     """
     Represents a chat application with different types (conversational or RAG).
     """
 
     def __init__(self):
-        self.apps = {
-            "apps": [
-                {
-                    "id": "virtualassistant",
-                    "prompt": "some prompt",
-                    "model": "mistral:7b-instruct-q3_K_S",
-                    "chat_app_type": {"name": "chat"},
-                    "initial_messages": [
-                        {"role": "assistant", "content": "How can I help you? :)"},
-                    ],
-                },
-                {
-                    "id": "llamaindex_repo",
-                    "prompt": "some prompt",
-                    "model": "mistral:7b-instruct-q3_K_S",
-                    "chat_app_type": {
-                        "name": "rag",
-                        "input_dir": "./data/llamaindex_repo",
-                        "table": "asdf",
-                        "vector_store_path": "./data/llamaindex_repo_db",
-                        "embed_model": "nomic-embed-text",
-                    },
-                    "initial_messages": [
-                        {
-                            "role": "assistant",
-                            "content": "Hi, you can ask everything about llamaindex.",
-                        },
-                    ],
-                },
-            ]
-        }
+        self.load_apps_from_disk()
+
+    def load_apps_from_disk(self):
+        """
+        Loads apps from disk.
+        """
+        apps_path = os.path.join(self.get_apps_save_dir(), "apps.json")
+        if not os.path.exists(apps_path):
+            return
+
+        with open(apps_path, "r") as apps_file:
+            self.apps = json.load(apps_file)
+
+    def get_apps_save_dir(self):
+        """
+        Returns the directory path for chat apps.
+        """
+        apps_dir = user_config_dir("ollama-rag-tui")
+        if os.environ.get("OLLAMA-RAG-TUI-APPS-PATH"):
+            apps_dir = os.environ["OLLAMA-RAG-TUI-APPS-PATH"]
+
+        return apps_dir
+
+    def save_apps_to_disk(self):
+        """
+        Saves session data to disk.
+        """
+        apps_dir = self.get_apps_save_dir()
+        if not os.path.exists(apps_dir):
+            os.makedirs(apps_dir)
+
+        apps_path = os.path.join(apps_dir, "apps.json")
+
+        with open(apps_path, "w") as apps_file:
+            json.dump(
+                self.apps,
+                apps_file,
+                indent=2,
+            )
 
     def get_chat_apps_preview(self):
         """

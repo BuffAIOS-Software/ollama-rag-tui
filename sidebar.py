@@ -34,10 +34,14 @@ class Sidebar(Widget):
             prev = self.create_preview(preview)
             previews.append(prev)
 
+        initial_index = (
+            0
+            if not self.sessionmanager.get_current_session_index()
+            else self.sessionmanager.get_current_session_index() + 1
+        )
+
         self.container = ChatListView(
-            *previews,
-            id="sidebar-listview",
-            initial_index=self.sessionmanager.get_current_session_index() + 1,
+            *previews, id="sidebar-listview", initial_index=initial_index
         )
         yield self.container
 

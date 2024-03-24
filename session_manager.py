@@ -216,14 +216,14 @@ class SessionManager:
                 session_file,
                 indent=2,
             )
-        return session_path
 
     def set_current_session_scrollpos(self, current_scroll_pos):
         """
         Sets the scroll position for the current session.
         """
         session = self.get_session_by_id(self.current_session)
-        session["scroll_pos"] = current_scroll_pos
+        if session:
+            session["scroll_pos"] = current_scroll_pos
         self.save_sessions_to_disk()
 
     def get_current_session_scrollpos(self):
@@ -231,4 +231,8 @@ class SessionManager:
         Returns the scroll position for the current session.
         """
         session = self.get_session_by_id(self.current_session)
-        return session["scroll_pos"]
+
+        if session:
+            return session["scroll_pos"]
+
+        return
