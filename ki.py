@@ -1,5 +1,4 @@
 from ollama import AsyncClient
-import os
 from llama_index.core import (
     VectorStoreIndex,
     SimpleDirectoryReader,
@@ -9,25 +8,32 @@ from llama_index.core import (
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.llms.ollama import Ollama
 from llama_index.vector_stores.lancedb import LanceDBVectorStore
-
-# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-# logging.getLogger().addHandler(logging.FileHandler("debug.log"))
-# logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+import os
 
 
 class Ki:
+    """
+    Represents the knowledge interface for handling chat queries.
+    """
 
     def __init__(self, chat_app):
-        self.current_ki = None
         self.chat_app = chat_app
         self.index = None
 
     async def generate_streaming_response(self, session):
+        """
+        Generates a streaming response for the given session.
+        """
         app = self.chat_app.get_chat_app_by_id(session["app"])
 
         if app["chat_app_type"]["name"] == "chat":
+            cleared_messaged = [
+                {k: v for k, v in message.items() if k not in ["id", "timestamp"]}
+                for message in session["messages"]
+            ]
+
             async for chunk in await AsyncClient().chat(
-                model=app["model"], messages=session["messages"], stream=True
+                model=app["model"], messages=cleared_messaged, stream=True
             ):
                 yield chunk["message"]["content"]
 
@@ -43,6 +49,9 @@ class Ki:
                 yield text
 
     def setup_rag(self, chat_app):
+        """
+        Sets up the Retrieval-Augmented Generation (RAG) index.
+        """
         model = chat_app["model"]
 
         embed_model = OllamaEmbedding(

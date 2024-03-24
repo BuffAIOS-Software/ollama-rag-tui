@@ -1,6 +1,9 @@
 class ChatApp:
+    """
+    Represents a chat application with different types (conversational or RAG).
+    """
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.apps = {
             "apps": [
                 {
@@ -19,6 +22,7 @@ class ChatApp:
                     "chat_app_type": {
                         "name": "rag",
                         "input_dir": "./data/llamaindex_repo",
+                        "table": "asdf",
                         "vector_store_path": "./data/llamaindex_repo_db",
                         "embed_model": "nomic-embed-text",
                     },
@@ -33,6 +37,9 @@ class ChatApp:
         }
 
     def get_chat_apps_preview(self):
+        """
+        Returns a list of formatted strings representing chat app previews.
+        """
         max_id_length = max(len(app["id"]) for app in self.apps["apps"])
         formatted_apps = []
         for app in self.apps["apps"]:
@@ -46,7 +53,13 @@ class ChatApp:
         return formatted_apps
 
     def get_chat_app_by_index(self, index):
+        """
+        Returns the chat app at the given index.
+        """
         return self.apps["apps"][index]
 
     def get_chat_app_by_id(self, id):
+        """
+        Returns the chat app with the given ID.
+        """
         return next((app for app in self.apps["apps"] if app["id"] == id), None)

@@ -1,20 +1,15 @@
-from textual.app import App, ComposeResult
-from textual.containers import Grid
-from textual.screen import ModalScreen
-from textual.widgets import Button, Footer, Header, Label
-
-from textual.reactive import reactive
-
+from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
+from textual.screen import ModalScreen
+from textual.widgets import Button, Input, Label, RadioSet
 
-from textual.widgets import Button, Input
-
-from textual.widgets import RadioButton, RadioSet
-
-from ChatApp import ChatApp
+from chat_app import ChatApp
 
 
 class NewChatScreen(ModalScreen):
+    """
+    A modal screen for creating a new chat session.
+    """
 
     def __init__(self, sessionmanager, chat_app: ChatApp, **kw):
         super().__init__()
@@ -23,6 +18,9 @@ class NewChatScreen(ModalScreen):
         self.save_disabled = {"input": True, "radio": True}
 
     def compose(self) -> ComposeResult:
+        """
+        Composes the user interface for the new chat screen.
+        """
         with Vertical():
             yield Label("Add new Session")
             with Horizontal():
@@ -33,6 +31,9 @@ class NewChatScreen(ModalScreen):
             yield Button("Close", variant="error", id="close")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
+        """
+        Handles button press events for the new chat screen.
+        """
         if event.button.id == "close":
             self.dismiss(None)
         if event.button.id == "save":
@@ -43,10 +44,16 @@ class NewChatScreen(ModalScreen):
             self.dismiss(True)
 
     def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
+        """
+        Handles radio set change events for the new chat screen.
+        """
         self.save_disabled["radio"] = False
         self.enable_save()
 
     def on_input_changed(self, _) -> None:
+        """
+        Handles input change events for the new chat screen.
+        """
         input = self.query_one(Input)
 
         if self.sessionmanager.session_exists(input.value):
@@ -64,6 +71,9 @@ class NewChatScreen(ModalScreen):
         self.enable_save()
 
     def enable_save(self):
+        """
+        Enables or disables the save button based on the input and radio set state.
+        """
         if self.save_disabled["input"] or self.save_disabled["radio"]:
             self.query_one("#save").disabled = True
         else:
