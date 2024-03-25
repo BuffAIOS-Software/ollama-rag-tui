@@ -21,13 +21,13 @@ class SessionManager:
         self.sidebar_scrollpos = 0
         self.load_sessions_from_disk()
 
-    def get_sessions(self):
+    def get_all_sessions(self):
         """
         Returns a list of all sessions.
         """
         return self.sessions
 
-    def get_last_action(self):
+    def get_last_performed_action(self):
         """
         Returns the last action performed.
         """
@@ -52,7 +52,7 @@ class SessionManager:
             None,
         )
 
-    def get_current_messages(self):
+    def get_messages_for_current_session(self):
         """
         Returns the messages for the current session.
         """

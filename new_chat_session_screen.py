@@ -27,7 +27,7 @@ class NewChatSessionScreen(ModalScreen):
                 yield Label("Session name:")
                 yield Input(id="session_name")
             yield RadioSet(
-                *self.chat_app_manager.get_formatted_chat_app_previews(), id="app"
+                *self.chat_app_manager.get_formatted_chat_app_previews_list(), id="app"
             )
             yield Button("Save", variant="primary", id="save", disabled=True)
             yield Button("Close", variant="error", id="close")

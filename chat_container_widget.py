@@ -52,7 +52,7 @@ class ChatContainerWidget(Widget):
         Generates the chat widget for the current session.
         """
         messages = []
-        current_messages = self.session_manager.get_current_messages()
+        current_messages = self.session_manager.get_messages_for_current_session()
         if current_messages:
             for message in current_messages:
                 chat_message_widget = self.create_chat_message_widget(
@@ -88,7 +88,7 @@ class ChatContainerWidget(Widget):
         """
         Updates the chat container based on the last action performed.
         """
-        last_action = self.session_manager.get_last_action()
+        last_action = self.session_manager.get_last_performed_action()
         if not last_action:
             return
         if last_action["action"] == "set_chat" or last_action["action"] == "add_chat":
@@ -125,7 +125,7 @@ class ChatContainerWidget(Widget):
             textarea.disabled = True
             send_button.disabled = True
             content = ""
-            async for chunk in self.ki.generate_streaming_response(session):
+            async for chunk in self.ki.generate_response_stream(session):
                 content += chunk
                 widget.item.update(content.strip())
                 self.container.scroll_end(animate=False)

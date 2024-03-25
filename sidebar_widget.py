@@ -30,7 +30,7 @@ class SidebarWidget(Widget):
         Composes the sidebar user interface.
         """
         previews = []
-        for preview in self.session_manager.get_sessions():
+        for preview in self.session_manager.get_all_sessions():
             prev = self.create_session_preview(preview)
             previews.append(prev)
 
@@ -68,7 +68,7 @@ class SidebarWidget(Widget):
         """
         Updates the sidebar based on the last action performed.
         """
-        last_action = self.session_manager.get_last_action()
+        last_action = self.session_manager.get_last_performed_action()
         if not last_action:
             return
         if last_action["action"] == "add_chat":

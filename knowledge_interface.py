@@ -20,7 +20,7 @@ class KnowledgeInterface:
         self.chat_app = chat_app
         self.index = None
 
-    async def generate_streaming_response(self, session):
+    async def generate_response_stream(self, session):
         """
         Generates a streaming response for the given session.
         """

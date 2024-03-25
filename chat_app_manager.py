@@ -17,7 +17,7 @@ class ChatAppManager:
         apps_path = os.path.join(self.get_apps_save_dir(), "apps.json")
         save_data(self.chat_apps, apps_path)
 
-    def get_formatted_chat_app_previews(self):
+    def get_formatted_chat_app_previews_list(self):
         max_id_length = max(len(app["id"]) for app in self.chat_apps["apps"])
         formatted_chat_apps = []
         for app in self.chat_apps["apps"]:
