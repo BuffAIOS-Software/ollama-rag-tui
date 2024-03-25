@@ -1,6 +1,6 @@
 from textual.app import ComposeResult
 from textual.reactive import reactive
-from textual.widgets import ListItem, Static, Button, TextArea, ListView
+from textual.widgets import ListItem, Button, TextArea, ListView, Markdown
 from textual.containers import Horizontal
 from textual.widget import Widget
 from textual.message import Message
@@ -71,7 +71,7 @@ class ChatContainerWidget(Widget):
         """
         Creates a chat box widget for a message.
         """
-        chat_message = Static(
+        chat_message = Markdown(
             content,
             classes=f"chat-container-message {classes}".strip(),
             id=message_id,
@@ -152,7 +152,7 @@ class StaticItem(ListItem):
     A list item that contains a static widget.
     """
 
-    def __init__(self, item: Static, **kw) -> None:
+    def __init__(self, item: Widget, **kw) -> None:
         self.item = item
         super().__init__(**kw)
 

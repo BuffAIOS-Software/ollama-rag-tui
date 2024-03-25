@@ -24,6 +24,7 @@ SessionPreviewWidget {
 .chat-container-message {
     border: $border-normal;
     background: $color2;
+    margin: 0;
 }
 
 TextArea {
