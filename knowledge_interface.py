@@ -11,7 +11,7 @@ from llama_index.vector_stores.lancedb import LanceDBVectorStore
 import os
 
 
-class Ki:
+class KnowledgeInterface:
     """
     Represents the knowledge interface for handling chat queries.
     """

@@ -4,14 +4,13 @@ from textual.widgets import Header, Footer, Button, TextArea
 from textual.containers import Horizontal
 from datetime import datetime
 from textual import on
-from textual.message import Message
 
-from chat_app import ChatApp
-from ki import Ki
-from sidebar import Sidebar
-from chat_container import ChatContainer, SaveAndQuitMessage
-from new_chat_screen import NewChatScreen
-from new_app_screen import NewAppScreen
+from chat_app_manager import ChatAppManager
+from knowledge_interface import KnowledgeInterface
+from sidebar_widget import SidebarWidget
+from chat_container_widget import ChatContainerWidget, SaveAndQuitMessage
+from new_chat_session_screen import NewChatSessionScreen
+from new_chat_app_screen import NewChatAppScreen
 from session_manager import SessionManager
 
 
@@ -21,9 +20,9 @@ class ChatManager(App):
     """
 
     CSS_PATH = "chat.tcss"
-    sessionmanager = SessionManager()
-    chat_app = ChatApp()
-    ki = Ki(chat_app)
+    session_manager = SessionManager()
+    chat_app_manager = ChatAppManager()
+    knowledge_interface = KnowledgeInterface(chat_app_manager)
     trigger_sidebar = reactive("")
     trigger_chatcontainer = reactive("")
 
@@ -32,12 +31,12 @@ class ChatManager(App):
         Composes the user interface.
         """
         yield Horizontal(
-            Sidebar(self.sessionmanager, id="sidebar").data_bind(
+            SidebarWidget(self.session_manager, id="sidebar").data_bind(
                 ChatManager.trigger_sidebar
             ),
-            ChatContainer(self.sessionmanager, self.ki, id="chatcontainer").data_bind(
-                ChatManager.trigger_chatcontainer
-            ),
+            ChatContainerWidget(
+                self.session_manager, self.knowledge_interface, id="chatcontainer"
+            ).data_bind(ChatManager.trigger_chatcontainer),
         )
 
         yield Header(id="header")
@@ -49,7 +48,7 @@ class ChatManager(App):
         """
         pressed_id = event.button.id
 
-        if pressed_id == "new_chat":
+        if pressed_id == "new-chat-button":
 
             def new_session(session) -> None:
                 if session:
@@ -57,22 +56,23 @@ class ChatManager(App):
                     self.trigger_chatcontainer = datetime.now()
 
             self.push_screen(
-                NewChatScreen(self.sessionmanager, self.chat_app), new_session
+                NewChatSessionScreen(self.session_manager, self.chat_app_manager),
+                new_session,
             )
 
-        if pressed_id == "send_input":
+        if pressed_id == "send-input-button":
             input_text = self.query_one(TextArea).text
             if input_text.strip():
-                self.sessionmanager.add_user_message(input_text)
+                self.session_manager.add_user_message(input_text)
                 self.trigger_chatcontainer = datetime.now()
             else:
                 self.notify("Cannot send empty input...")
 
-        if pressed_id == "clear_input":
+        if pressed_id == "clear-input-button":
             self.query_one(TextArea).clear()
 
-        if pressed_id == "new_app":
-            self.push_screen(NewAppScreen(self.sessionmanager, self.chat_app))
+        if pressed_id == "new-app-button":
+            self.push_screen(NewChatAppScreen(self.chat_app_manager))
 
     @on(TextArea.Changed)
     def expand_textarea(self, textarea: TextArea.Changed):
@@ -89,8 +89,8 @@ class ChatManager(App):
         selected_id = selected.control.id
         if selected_id == "sidebar-listview":
             current_scroll_pos = self.query_one("#chatcontainer-listview").scroll_y
-            self.sessionmanager.set_current_session_scrollpos(current_scroll_pos)
-            self.sessionmanager.set_current_session(
+            self.session_manager.set_current_session_scrollpos(current_scroll_pos)
+            self.session_manager.set_current_session(
                 selected.item.children[0].id, "set_chat"
             )
             self.trigger_chatcontainer = datetime.now()
@@ -101,7 +101,7 @@ class ChatManager(App):
         Saves the sessions and quits the application.
         """
         current_scroll_pos = self.query_one("#chatcontainer-listview").scroll_y
-        self.sessionmanager.set_current_session_scrollpos(current_scroll_pos)
+        self.session_manager.set_current_session_scrollpos(current_scroll_pos)
         self.exit(0)
 
 

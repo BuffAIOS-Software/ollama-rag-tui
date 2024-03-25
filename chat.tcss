@@ -1,31 +1,46 @@
+$color0: white;
+$color1: grey;
+$color2: black;
+$color3: dimgrey;
+$color-error: red;
+$border: solid;
+$border-normal: $border $color0;
+$border-input: $border $color2;
+$border-error: $border $color-error;
+
 #header {
-    background: #a12;
+    background: $color1;
 }
-#containerSession {
-    background: #848;
-    border: solid;
+
+/*TODO*/
+Footer {
+    background: $color1;
 }
-.previewSession {
-    border: solid;
+
+SessionPreviewWidget {
+    border: $border-normal;
 }
-.chatbox {
-    border: solid;
+
+.chat-container-message {
+    border: $border-normal;
+    background: $color2;
 }
 
 TextArea {
-    background: grey;
+    background: $color1;
     height: 3;
     max-height: 80%;
+    border: $border-input;
 }
 
-Sidebar {
-    background: #e4e;
+SidebarWidget {
+    background: $color2;
     width: 32; /* check with button size */
 }
 
-#sidebar-listview {
+ChatSessionListView {
     height: 1fr;
-    border: solid;
+    /*border: $border-normal;*/
 }
 
 #sidebar-button-container {
@@ -36,28 +51,23 @@ Sidebar {
     height: 3; /* Depends on the button size */
 }
 
-#new_chat {
+#new-chat-button {
     width: 50%;
 }
-#new_app {
+#new-app-button {
     width: 50%;
 }
 
-
-ChatContainer {
-    background: yellow;
+ChatContainerWidget {
+    background: $color3;
     width: 1fr; /* This is really importent because the container overflows otherwise */
 }
 
-Screen {
-    layout: horizontal;
+.input-error {
+    border: $border-error;
 }
 
-
-.input_error {
-    border: tall red;
-}
-
+/*TODO*/
 ListItem {
     color: $text;
     background: $panel-lighten-1;

@@ -8,16 +8,16 @@ import asyncio
 from textual.binding import Binding, BindingType
 
 
-class ChatContainer(Widget):
+class ChatContainerWidget(Widget):
     """
     The container widget that displays the chat messages and input field.
     """
 
     trigger_chatcontainer = reactive("")
 
-    def __init__(self, sessionmanager, ki, **kw):
-        super().__init__()
-        self.sessionmanager = sessionmanager
+    def __init__(self, session_manager, ki, **kw):
+        super().__init__(**kw)
+        self.session_manager = session_manager
         self.ki = ki
 
     def watch_trigger_chatcontainer(self, data) -> None:
@@ -31,7 +31,7 @@ class ChatContainer(Widget):
         Composes the chat container user interface.
         """
         self.container = ChatListView(
-            *self.generate_current_chat(), id="chatcontainer-listview"
+            *self.generate_current_chat_messages(), id="chatcontainer-listview"
         )
         yield self.container
         self.chatinput = TextArea(
@@ -39,50 +39,56 @@ class ChatContainer(Widget):
         )
         yield self.chatinput
         yield Horizontal(
-            Button("Send", id="send_input"),
-            Button("Clear input", id="clear_input"),
+            Button("Send", id="send-input-button"),
+            Button("Clear input", id="clear-input-button"),
             id="textarea-button-container",
         )
         self.container.scroll_to(
-            y=self.sessionmanager.get_current_session_scrollpos(), animate=False
+            y=self.session_manager.get_current_session_scrollpos(), animate=False
         )
 
-    def generate_current_chat(self):
+    def generate_current_chat_messages(self):
         """
         Generates the chat widget for the current session.
         """
         messages = []
-        current_messages = self.sessionmanager.get_current_messages()
+        current_messages = self.session_manager.get_current_messages()
         if current_messages:
             for message in current_messages:
-                prev = self.create_chat_box(
+                chat_message_widget = self.create_chat_message_widget(
                     message["role"],
                     message["content"],
                     message["timestamp"],
                     message["id"],
                 )
-                messages.append(prev)
+                messages.append(chat_message_widget)
             return messages
         return []
 
-    def create_chat_box(self, role, content, timestamp, id, classes=""):
+    def create_chat_message_widget(
+        self, role, content, timestamp, message_id, classes=""
+    ):
         """
         Creates a chat box widget for a message.
         """
-        chat = Static(
+        chat_message = Static(
             content,
-            classes=f"chatbox {classes}".strip(),
-            id=id,
+            classes=f"chat-container-message {classes}".strip(),
+            id=message_id,
         )
-        chat.border_title = f"{role} ({timestamp})"
-        listitem = StaticItem(chat, id=f"chatboxItem{id}", classes="chatboxItem")
-        return listitem
+        chat_message.border_title = f"{role} ({timestamp})"
+        chat_message_item = StaticItem(
+            chat_message,
+            id=f"chat_message_item_{message_id}",
+            classes="chat-container-static-item",
+        )
+        return chat_message_item
 
     def update(self):
         """
         Updates the chat container based on the last action performed.
         """
-        last_action = self.sessionmanager.get_last_action()
+        last_action = self.session_manager.get_last_action()
         if not last_action:
             return
         if last_action["action"] == "set_chat" or last_action["action"] == "add_chat":
@@ -94,7 +100,7 @@ class ChatContainer(Widget):
         """
         Adds a new message to the chat and generates a response from the AI.
         """
-        chat_box = self.create_chat_box(
+        chat_box = self.create_chat_message_widget(
             session["messages"][-1]["role"],
             session["messages"][-1]["content"],
             session["messages"][-1]["timestamp"],
@@ -103,8 +109,8 @@ class ChatContainer(Widget):
         self.container.append(chat_box)
         self.container.scroll_end(animate=False)
 
-        role, timestamp, id = self.sessionmanager.generate_empty_assistant_message()
-        assistant_chat_box = self.create_chat_box(
+        role, timestamp, id = self.session_manager.generate_empty_assistant_message()
+        assistant_chat_box = self.create_chat_message_widget(
             role,
             "",
             timestamp,
@@ -114,7 +120,7 @@ class ChatContainer(Widget):
 
         async def handle_ki_response(widget, session):
             textarea = self.query_one(TextArea)
-            send_button = self.query_one("#send_input")
+            send_button = self.query_one("#send-input-button")
             textarea.text = ""
             textarea.disabled = True
             send_button.disabled = True
@@ -126,7 +132,7 @@ class ChatContainer(Widget):
 
             textarea.disabled = False
             send_button.disabled = False
-            self.sessionmanager.add_assistant_message(content, timestamp, id)
+            self.session_manager.add_assistant_message(content, timestamp, id)
 
         asyncio.create_task(handle_ki_response(assistant_chat_box, session))
 
@@ -135,9 +141,9 @@ class ChatContainer(Widget):
         Changes the chat to the current session.
         """
         self.container.clear()
-        self.container.extend(self.generate_current_chat())
+        self.container.extend(self.generate_current_chat_messages())
         self.container.scroll_to(
-            y=self.sessionmanager.get_current_session_scrollpos(), animate=False
+            y=self.session_manager.get_current_session_scrollpos(), animate=False
         )
 
 
@@ -148,7 +154,7 @@ class StaticItem(ListItem):
 
     def __init__(self, item: Static, **kw) -> None:
         self.item = item
-        super().__init__()
+        super().__init__(**kw)
 
     def compose(self) -> ComposeResult:
         """

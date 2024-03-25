@@ -3,17 +3,17 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label, RadioSet
 
-from chat_app import ChatApp
+from chat_app_manager import ChatAppManager
 
 
-class NewAppScreen(ModalScreen):
+class NewChatAppScreen(ModalScreen):
     """
     A modal screen for creating a new chat app.
     """
 
-    def __init__(self, sessionmanager, chat_app: ChatApp, **kw):
-        super().__init__()
-        self.chat_app = chat_app
+    def __init__(self, chat_app_manager: ChatAppManager, **kw):
+        super().__init__(**kw)
+        self.chat_app_manager = chat_app_manager
 
     def compose(self) -> ComposeResult:
         """

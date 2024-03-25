@@ -17,7 +17,7 @@ class SessionManager:
     def __init__(self):
         self.last_action = None
         self.sessions = []
-        self.current_session = None
+        self.current_session_id = None
         self.sidebar_scrollpos = 0
         self.load_sessions_from_disk()
 
@@ -37,7 +37,7 @@ class SessionManager:
         """
         Returns the ID of the current session.
         """
-        return self.current_session
+        return self.current_session_id
 
     def get_current_session_index(self):
         """
@@ -47,7 +47,7 @@ class SessionManager:
             (
                 index
                 for (index, session) in enumerate(self.sessions)
-                if session["id"] == self.current_session
+                if session["id"] == self.current_session_id
             ),
             None,
         )
@@ -56,7 +56,7 @@ class SessionManager:
         """
         Returns the messages for the current session.
         """
-        session = self.get_session_by_id(self.current_session)
+        session = self.get_session_by_id(self.current_session_id)
         if session:
             return session["messages"]
 
@@ -64,7 +64,7 @@ class SessionManager:
         """
         Adds a user message to the current session.
         """
-        session = self.get_session_by_id(self.current_session)
+        session = self.get_session_by_id(self.current_session_id)
         message = {
             "role": "user",
             "content": content,
@@ -80,7 +80,7 @@ class SessionManager:
         """
         Adds an assistant message to the current session.
         """
-        session = self.get_session_by_id(self.current_session)
+        session = self.get_session_by_id(self.current_session_id)
         message = {
             "role": "assistant",
             "content": content,
@@ -101,24 +101,26 @@ class SessionManager:
         """
         Generates a unique ID for the next message in the current session.
         """
-        session = self.get_session_by_id(self.current_session)
+        session = self.get_session_by_id(self.current_session_id)
         last_id = int(session["messages"][-1]["id"].split("-")[1])
         return f"{session['id']}-{last_id + 1}"
 
-    def set_current_session(self, id, action):
+    def set_current_session(self, session_id, action):
         """
         Sets the current session and updates the last action.
         """
-        self.current_session = id
-        session = self.get_session_by_id(self.current_session)
+        self.current_session_id = session_id
+        session = self.get_session_by_id(self.current_session_id)
         self.last_action = {"action": action, "data": session}
         self.save_sessions_to_disk()
 
-    def get_session_by_id(self, id):
+    def get_session_by_id(self, session_id):
         """
         Returns the session with the given ID.
         """
-        return next((session for session in self.sessions if session["id"] == id), None)
+        return next(
+            (session for session in self.sessions if session["id"] == session_id), None
+        )
 
     def get_session_count(self):
         """
@@ -133,38 +135,38 @@ class SessionManager:
         session_names = [session["id"] for session in self.sessions]
         return session_name in session_names
 
-    def add_session(self, new_session, app):
+    def add_session(self, new_session_name, chat_app):
         """
         Adds a new session with initial messages from the given app.
         """
         current_timestamp = self.generate_timestamp()
         message_ids = self.generate_message_ids(
-            new_session, len(app["initial_messages"])
+            new_session_name, len(chat_app["initial_messages"])
         )
 
         initial_messages = [
             {**message, "timestamp": current_timestamp, "id": message_id}
             for message, message_id in zip(
-                deepcopy(app["initial_messages"]), message_ids
+                deepcopy(chat_app["initial_messages"]), message_ids
             )
         ]
 
         self.sessions.append(
             {
-                "id": new_session,
-                "app": app["id"],
+                "id": new_session_name,
+                "app": chat_app["id"],
                 "scroll_pos": 0,
                 "messages": initial_messages,
             },
         )
-        self.set_current_session(new_session, "add_chat")
+        self.set_current_session(new_session_name, "add_chat")
         self.save_sessions_to_disk()
 
     def set_current_session_scrollpos(self, current_scroll_pos):
         """
         Sets the scroll position for the current session.
         """
-        session = self.get_session_by_id(self.current_session)
+        session = self.get_session_by_id(self.current_session_id)
         if session:
             session["scroll_pos"] = current_scroll_pos
         self.save_sessions_to_disk()
@@ -173,7 +175,7 @@ class SessionManager:
         """
         Returns the scroll position for the current session.
         """
-        session = self.get_session_by_id(self.current_session)
+        session = self.get_session_by_id(self.current_session_id)
 
         if session:
             return session["scroll_pos"]
@@ -184,7 +186,7 @@ class SessionManager:
         session_path = os.path.join(self.get_session_save_dir(), "session.json")
         data = load_data(session_path)
         if data:
-            self.current_session = data.get("last_session")
+            self.current_session_id = data.get("last_session")
             self.sidebar_scrollpos = data.get("sidebar_scrollpos")
             self.sessions = data.get("sessions", [])
 
@@ -192,7 +194,7 @@ class SessionManager:
         session_path = os.path.join(self.get_session_save_dir(), "session.json")
         save_data(
             {
-                "last_session": self.current_session,
+                "last_session": self.current_session_id,
                 "sidebar_scrollpos": self.sidebar_scrollpos,
                 "sessions": self.sessions,
             },

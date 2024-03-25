@@ -5,19 +5,19 @@ from textual.containers import Horizontal
 from textual.widget import Widget
 from textual.binding import Binding, BindingType
 
-from chat_container import SaveAndQuitMessage
+from chat_container_widget import SaveAndQuitMessage
 
 
-class Sidebar(Widget):
+class SidebarWidget(Widget):
     """
     The sidebar widget that displays a list of chat sessions.
     """
 
     trigger_sidebar = reactive("")
 
-    def __init__(self, sessionmanager, **kw):
-        super().__init__()
-        self.sessionmanager = sessionmanager
+    def __init__(self, session_manager, **kw):
+        super().__init__(**kw)
+        self.session_manager = session_manager
 
     def watch_trigger_sidebar(self, data) -> None:
         """
@@ -30,33 +30,33 @@ class Sidebar(Widget):
         Composes the sidebar user interface.
         """
         previews = []
-        for preview in self.sessionmanager.get_sessions():
-            prev = self.create_preview(preview)
+        for preview in self.session_manager.get_sessions():
+            prev = self.create_session_preview(preview)
             previews.append(prev)
 
         initial_index = (
             0
-            if not self.sessionmanager.get_current_session_index()
-            else self.sessionmanager.get_current_session_index() + 1
+            if not self.session_manager.get_current_session_index()
+            else self.session_manager.get_current_session_index() + 1
         )
 
-        self.container = ChatListView(
+        self.container = ChatSessionListView(
             *previews, id="sidebar-listview", initial_index=initial_index
         )
         yield self.container
 
         yield Horizontal(
-            Button("New chat", id="new_chat"),
-            Button("New app", id="new_app"),
+            Button("New chat", id="new-chat-button"),
+            Button("New app", id="new-app-button"),
             id="sidebar-button-container",
         )
 
-    def create_preview(self, session):
+    def create_session_preview(self, session):
         """
         Creates a preview widget for a chat session.
         """
         return StaticItem(
-            PreviewSession(
+            SessionPreviewWidget(
                 self.generate_preview(session["messages"]),
                 classes="previewSession",
                 id=session["id"],
@@ -68,17 +68,17 @@ class Sidebar(Widget):
         """
         Updates the sidebar based on the last action performed.
         """
-        last_action = self.sessionmanager.get_last_action()
+        last_action = self.session_manager.get_last_action()
         if not last_action:
             return
         if last_action["action"] == "add_chat":
-            self.add_preview(last_action["data"])
+            self.add_session_preview(last_action["data"])
         elif last_action["action"] == "add_message":
-            self.update_preview(last_action["session"])
+            self.update_session_preview(last_action["session"])
         elif last_action["action"] == "remove_chat":
-            self.delete_preview(last_action["session"])
+            self.delete_session_preview(last_action["session"])
 
-    def focus_preview(self, session):
+    def focus_session_preview(self, session):
         """
         Focuses the preview widget for the given session.
         """
@@ -94,22 +94,22 @@ class Sidebar(Widget):
             output += f"{msg['role']}: {content}\n"
         return output.strip()
 
-    def add_preview(self, session):
+    def add_session_preview(self, session):
         """
         Adds a new preview widget for the given session.
         """
-        preview = self.create_preview(session)
-        self.container.append(preview)
-        self.container.index = self.sessionmanager.get_session_count() - 1
+        session_preview = self.create_session_preview(session)
+        self.container.append(session_preview)
+        self.container.index = self.session_manager.get_session_count() - 1
 
-    def update_preview(self, session):
+    def update_session_preview(self, session):
         """
         Updates the preview widget for the given session.
         """
         preview = self.container.get_widget_by_id(session["id"])
         preview.update(session["content"])
 
-    def delete_preview(self, session):
+    def delete_session_preview(self, session):
         """
         Deletes the preview widget for the given session.
         """
@@ -117,7 +117,7 @@ class Sidebar(Widget):
         self.container.get_widget_by_id(f"previewItem{session['id']}").remove()
 
 
-class PreviewSession(Static):
+class SessionPreviewWidget(Static):
     """
     A static widget that displays a preview of a chat session.
     """
@@ -138,7 +138,7 @@ class StaticItem(ListItem):
 
     def __init__(self, item: Static, **kw) -> None:
         self.item = item
-        super().__init__()
+        super().__init__(**kw)
 
     def compose(self) -> ComposeResult:
         """
@@ -147,7 +147,7 @@ class StaticItem(ListItem):
         yield self.item
 
 
-class ChatListView(ListView):
+class ChatSessionListView(ListView):
     """
     A list view for displaying chat sessions in the sidebar.
     """
