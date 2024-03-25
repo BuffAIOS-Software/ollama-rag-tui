@@ -13,14 +13,14 @@ class ChatContainerWidget(Widget):
     The container widget that displays the chat messages and input field.
     """
 
-    trigger_chatcontainer = reactive("")
+    chat_container_update_trigger = reactive("")
 
     def __init__(self, session_manager, ki, **kw):
         super().__init__(**kw)
         self.session_manager = session_manager
         self.ki = ki
 
-    def watch_trigger_chatcontainer(self, data) -> None:
+    def watch_chat_container_update_trigger(self, data) -> None:
         """
         Watches for changes to the trigger and updates the chat container.
         """

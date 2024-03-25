@@ -23,8 +23,8 @@ class ChatManager(App):
     session_manager = SessionManager()
     chat_app_manager = ChatAppManager()
     knowledge_interface = KnowledgeInterface(chat_app_manager)
-    trigger_sidebar = reactive("")
-    trigger_chatcontainer = reactive("")
+    sidebar_update_trigger = reactive("")
+    chat_container_update_trigger = reactive("")
 
     def compose(self) -> ComposeResult:
         """
@@ -32,11 +32,11 @@ class ChatManager(App):
         """
         yield Horizontal(
             SidebarWidget(self.session_manager, id="sidebar").data_bind(
-                ChatManager.trigger_sidebar
+                ChatManager.sidebar_update_trigger
             ),
             ChatContainerWidget(
                 self.session_manager, self.knowledge_interface, id="chatcontainer"
-            ).data_bind(ChatManager.trigger_chatcontainer),
+            ).data_bind(ChatManager.chat_container_update_trigger),
         )
 
         yield Header(id="header")
@@ -52,8 +52,8 @@ class ChatManager(App):
 
             def new_session(session) -> None:
                 if session:
-                    self.trigger_sidebar = datetime.now()
-                    self.trigger_chatcontainer = datetime.now()
+                    self.sidebar_update_trigger = datetime.now()
+                    self.chat_container_update_trigger = datetime.now()
 
             self.push_screen(
                 NewChatSessionScreen(self.session_manager, self.chat_app_manager),
@@ -64,7 +64,7 @@ class ChatManager(App):
             input_text = self.query_one(TextArea).text
             if input_text.strip():
                 self.session_manager.add_user_message(input_text)
-                self.trigger_chatcontainer = datetime.now()
+                self.chat_container_update_trigger = datetime.now()
             else:
                 self.notify("Cannot send empty input...")
 
@@ -93,7 +93,7 @@ class ChatManager(App):
             self.session_manager.set_current_session(
                 selected.item.children[0].id, "set_chat"
             )
-            self.trigger_chatcontainer = datetime.now()
+            self.chat_container_update_trigger = datetime.now()
 
     @on(SaveAndQuitMessage)
     def save_and_quit(self):

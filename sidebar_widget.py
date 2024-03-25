@@ -13,13 +13,13 @@ class SidebarWidget(Widget):
     The sidebar widget that displays a list of chat sessions.
     """
 
-    trigger_sidebar = reactive("")
+    sidebar_update_trigger = reactive("")
 
     def __init__(self, session_manager, **kw):
         super().__init__(**kw)
         self.session_manager = session_manager
 
-    def watch_trigger_sidebar(self, data) -> None:
+    def watch_sidebar_update_trigger(self, data) -> None:
         """
         Watches for changes to the trigger and updates the sidebar.
         """
