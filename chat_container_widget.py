@@ -6,7 +6,12 @@ from textual.widget import Widget
 import asyncio
 from textual.binding import Binding, BindingType
 
-from chat_message_event import SaveAndQuitMessage, FocusTextArea, FocusSidebar
+from chat_message_event import (
+    SaveAndQuitMessage,
+    FocusChatTextArea,
+    FocusSidebar,
+    FocusChatContainer,
+)
 
 
 class ChatContainerWidget(Widget):
@@ -37,7 +42,8 @@ class ChatContainerWidget(Widget):
             *self.generate_current_chat_messages(), id="chatcontainer-listview"
         )
         yield self.container
-        self.chatinput = TextArea(
+
+        self.chatinput = ChatTextArea(
             id="chatinput", soft_wrap=False, show_line_numbers=True
         )
         yield self.chatinput
@@ -122,7 +128,7 @@ class ChatContainerWidget(Widget):
         self.container.append(assistant_chat_box)
 
         async def handle_ki_response(widget, session):
-            textarea = self.query_one(TextArea)
+            textarea = self.query_one(ChatTextArea)
             send_button = self.query_one("#send-input-button")
             textarea.text = ""
             textarea.disabled = True
@@ -196,7 +202,7 @@ class ChatListView(ListView):
         """
         Triggers the focus textarea event
         """
-        self.post_message(FocusTextArea())
+        self.post_message(FocusChatTextArea())
 
     def action_focus_sidebar(self):
         """
@@ -215,3 +221,15 @@ class ChatListView(ListView):
         Focus the first element in the list
         """
         self.index = len(self.children) - 1
+
+
+class ChatTextArea(TextArea):
+    BINDINGS = [
+        Binding("escape", "exit_insert", "Exit insert", show=True),
+    ]
+
+    def action_exit_insert(self):
+        """
+        Exit insert "mode"
+        """
+        self.post_message(FocusChatContainer())

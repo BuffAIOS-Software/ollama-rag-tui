@@ -5,7 +5,7 @@ from textual.containers import Horizontal
 from textual.widget import Widget
 from textual.binding import Binding, BindingType
 
-from chat_message_event import FocusTextArea, FocusChatContainer, SaveAndQuitMessage
+from chat_message_event import FocusChatTextArea, FocusChatContainer, SaveAndQuitMessage
 
 
 class SidebarWidget(Widget):
@@ -177,7 +177,7 @@ class ChatSessionListView(ListView):
         """
         Triggers the focus textarea event
         """
-        self.post_message(FocusTextArea())
+        self.post_message(FocusChatTextArea())
 
     def action_focus_chat_container(self):
         """

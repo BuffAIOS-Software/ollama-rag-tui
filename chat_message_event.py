@@ -5,7 +5,7 @@ class SaveAndQuitMessage(Message):
     pass
 
 
-class FocusTextArea(Message):
+class FocusChatTextArea(Message):
     pass
 
 

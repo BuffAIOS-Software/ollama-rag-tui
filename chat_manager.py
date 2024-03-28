@@ -8,12 +8,12 @@ from textual import on
 from chat_app_manager import ChatAppManager
 from knowledge_interface import KnowledgeInterface
 from sidebar_widget import SidebarWidget
-from chat_container_widget import ChatContainerWidget
+from chat_container_widget import ChatContainerWidget, ChatTextArea
 from new_chat_session_screen import NewChatSessionScreen
 from new_chat_app_screen import NewChatAppScreen
 from session_manager import SessionManager
 from chat_message_event import (
-    FocusTextArea,
+    FocusChatTextArea,
     FocusChatContainer,
     SaveAndQuitMessage,
     FocusSidebar,
@@ -67,7 +67,7 @@ class ChatManager(App):
             )
 
         if pressed_id == "send-input-button":
-            input_text = self.query_one(TextArea).text
+            input_text = self.query_one(ChatTextArea).text
             if input_text.strip():
                 self.session_manager.add_user_message(input_text)
                 self.chat_container_update_trigger = datetime.now()
@@ -75,13 +75,13 @@ class ChatManager(App):
                 self.notify("Cannot send empty input...")
 
         if pressed_id == "clear-input-button":
-            self.query_one(TextArea).clear()
+            self.query_one(ChatTextArea).clear()
 
         if pressed_id == "new-app-button":
             self.push_screen(NewChatAppScreen(self.chat_app_manager))
 
-    @on(TextArea.Changed)
-    def expand_textarea(self, textarea: TextArea.Changed):
+    @on(ChatTextArea.Changed)
+    def expand_textarea(self, textarea: ChatTextArea.Changed):
         """
         Expands the text area height based on the content.
         """
@@ -112,12 +112,12 @@ class ChatManager(App):
         self.session_manager.set_sidebar_scrollpos(current_scroll_pos_sidebar)
         self.exit(0)
 
-    @on(FocusTextArea)
+    @on(FocusChatTextArea)
     def focus_textarea(self):
         """
         Focus the TextArea
         """
-        self.query_one(TextArea).focus()
+        self.query_one(ChatTextArea).focus()
 
     @on(FocusChatContainer)
     def focus_chat_container(self):
