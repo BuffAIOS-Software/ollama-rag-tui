@@ -8,10 +8,11 @@ from textual import on
 from chat_app_manager import ChatAppManager
 from knowledge_interface import KnowledgeInterface
 from sidebar_widget import SidebarWidget
-from chat_container_widget import ChatContainerWidget, SaveAndQuitMessage
+from chat_container_widget import ChatContainerWidget
 from new_chat_session_screen import NewChatSessionScreen
 from new_chat_app_screen import NewChatAppScreen
 from session_manager import SessionManager
+from chat_message_event import FocusTextArea, FocusChatContainer, SaveAndQuitMessage
 
 
 class ChatManager(App):
@@ -105,6 +106,20 @@ class ChatManager(App):
         current_scroll_pos_sidebar = self.query_one("#sidebar-listview").scroll_y
         self.session_manager.set_sidebar_scrollpos(current_scroll_pos_sidebar)
         self.exit(0)
+
+    @on(FocusTextArea)
+    def focus_textarea(self):
+        """
+        Focus the TextArea
+        """
+        self.query_one(TextArea).focus()
+
+    @on(FocusChatContainer)
+    def focus_chat_container(self):
+        """
+        Focus the chat container
+        """
+        self.query_one("#chatcontainer-listview").focus()
 
 
 if __name__ == "__main__":

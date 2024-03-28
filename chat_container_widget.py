@@ -3,9 +3,10 @@ from textual.reactive import reactive
 from textual.widgets import ListItem, Button, TextArea, ListView, Markdown
 from textual.containers import Horizontal
 from textual.widget import Widget
-from textual.message import Message
 import asyncio
 from textual.binding import Binding, BindingType
+
+from chat_message_event import SaveAndQuitMessage
 
 
 class ChatContainerWidget(Widget):
@@ -186,7 +187,3 @@ class ChatListView(ListView):
         Triggers the save and quit action.
         """
         self.post_message(SaveAndQuitMessage())
-
-
-class SaveAndQuitMessage(Message):
-    pass
