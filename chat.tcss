@@ -72,6 +72,57 @@ ChatContainerWidget {
     border: $border-error;
 }
 
+NewChatSessionScreen {
+    align: center middle;
+    width: auto;
+}
+
+#dialog {
+    layout: grid;
+    grid-size: 3 5;
+    grid-columns: auto 4fr 1fr;
+    grid-rows: 3 3 3 1fr 3;
+    height: 28;
+    width: 95%;
+    border: thick $background 80%;
+    background: $surface;
+    grid-gutter: 0;
+}
+
+#label-header-new-session {
+    column-span: 3;
+    width: 1fr;
+    height: 1fr;
+    content-align: center middle;
+}
+
+#label-name-new-session {
+    padding: 1;
+    height: 1fr;
+    content-align: center middle;
+}
+
+#label-app-new-session {
+    padding: 1;
+    height: 1fr;
+    content-align: center middle;
+    column-span: 3;
+}
+
+#input-new-session {
+    column-span: 2;
+}
+
+#radio-container-new-session {
+    column-span: 3;
+    height: auto;
+    content-align: center middle;
+}
+
+#button-save-new-session {
+    column-span: 2;
+} 
+
 /*TODO*/
 /*ListItem {
     color: $text;

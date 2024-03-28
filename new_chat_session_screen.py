@@ -1,5 +1,5 @@
 from textual.app import ComposeResult
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal, VerticalScroll, Grid
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label, RadioSet
 
@@ -21,24 +21,31 @@ class NewChatSessionScreen(ModalScreen):
         """
         Composes the user interface for the new chat screen.
         """
-        with Vertical():
-            yield Label("Add new Session")
-            with Horizontal():
-                yield Label("Session name:")
-                yield Input(id="session_name")
-            yield RadioSet(
-                *self.chat_app_manager.get_formatted_chat_app_previews_list(), id="app"
-            )
-            yield Button("Save", variant="primary", id="save", disabled=True)
-            yield Button("Close", variant="error", id="close")
+        yield Grid(
+            Label("Add new Session", id="label-header-new-session"),
+            Label("Session name:", id="label-name-new-session"),
+            Input(id="input-new-session"),
+            Label("Choose an app for this session:", id="label-app-new-session"),
+            VerticalScroll(
+                RadioSet(
+                    *self.chat_app_manager.get_formatted_chat_app_previews_list(),
+                ),
+                id="radio-container-new-session",
+            ),
+            Button(
+                "Save", variant="primary", id="button-save-new-session", disabled=True
+            ),
+            Button("Close", variant="error", id="button-close-new-session"),
+            id="dialog",
+        )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """
         Handles button press events for the new chat screen.
         """
-        if event.button.id == "close":
+        if event.button.id == "button-close-new-session":
             self.dismiss(None)
-        if event.button.id == "save":
+        if event.button.id == "button-save-new-session":
             session_name = self.query_one(Input).value
             app_index = self.query_one(RadioSet).pressed_index
             app = self.chat_app_manager.get_chat_app_by_index(app_index)
@@ -77,6 +84,6 @@ class NewChatSessionScreen(ModalScreen):
         Enables or disables the save button based on the input and radio set state.
         """
         if self.save_disabled["input"] or self.save_disabled["radio"]:
-            self.query_one("#save").disabled = True
+            self.query_one("#button-save-new-session").disabled = True
         else:
-            self.query_one("#save").disabled = False
+            self.query_one("#button-save-new-session").disabled = False
