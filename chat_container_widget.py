@@ -237,6 +237,7 @@ class ChatTextArea(TextArea):
         Binding("escape", "exit_insert", "Exit insert", show=True),
         Binding("ctrl+q", "save_and_quit", "Save + Quit", show=True),
         Binding("ctrl+s", "send_message", "Send", show=True),
+        Binding("ctrl+a", "select_all", "Select all", show=True),
     ]
 
     def action_exit_insert(self):
