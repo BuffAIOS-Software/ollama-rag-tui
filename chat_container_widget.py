@@ -19,6 +19,7 @@ class ChatContainerWidget(Widget):
         super().__init__(**kw)
         self.session_manager = session_manager
         self.ki = ki
+        self.rendered_session = None
 
     def watch_chat_container_update_trigger(self, data) -> None:
         """
@@ -30,6 +31,7 @@ class ChatContainerWidget(Widget):
         """
         Composes the chat container user interface.
         """
+        self.rendered_session = self.session_manager.get_current_session_id()
         self.container = ChatListView(
             *self.generate_current_chat_messages(), id="chatcontainer-listview"
         )
@@ -140,11 +142,15 @@ class ChatContainerWidget(Widget):
         """
         Changes the chat to the current session.
         """
+        if self.rendered_session == self.session_manager.get_current_session_id():
+            return
+
         self.container.clear()
         self.container.extend(self.generate_current_chat_messages())
         self.container.scroll_to(
             y=self.session_manager.get_current_session_scrollpos(), animate=False
         )
+        self.rendered_session = self.session_manager.get_current_session_id()
 
 
 class StaticItem(ListItem):
