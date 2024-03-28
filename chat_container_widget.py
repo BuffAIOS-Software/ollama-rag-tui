@@ -128,10 +128,10 @@ class ChatContainerWidget(Widget):
         self.container.append(assistant_chat_box)
 
         async def handle_ki_response(widget, session):
-            textarea = self.query_one(ChatTextArea)
+            chattextarea = self.query_one(ChatTextArea)
             send_button = self.query_one("#send-input-button")
-            textarea.text = ""
-            textarea.disabled = True
+            chattextarea.text = ""
+            chattextarea.disabled = True
             send_button.disabled = True
             content = ""
             async for chunk in self.ki.generate_response_stream(session):
@@ -139,9 +139,10 @@ class ChatContainerWidget(Widget):
                 widget.item.update(content.strip())
                 self.container.scroll_end(animate=False)
 
-            textarea.disabled = False
+            chattextarea.disabled = False
             send_button.disabled = False
             self.session_manager.add_assistant_message(content, timestamp, id)
+            chattextarea.focus()
 
         asyncio.create_task(handle_ki_response(assistant_chat_box, session))
 
@@ -186,10 +187,11 @@ class ChatListView(ListView):
         Binding("k,up", "cursor_up", "Cursor Up", show=True),
         Binding("j,down", "cursor_down", "Cursor Down", show=True),
         Binding("ctrl+q", "save_and_quit", "Save + Quit", show=True),
-        Binding("i", "focus_textarea", "Focus Textarea", show=True),
+        Binding("i", "focus_chattextarea", "Focus Textarea", show=True),
         Binding("l,h", "focus_sidebar", "Focus Sidebar", show=True),
         Binding("0,g", "focus_first_element", "First Message", show=True),
         Binding("G", "focus_last_element", "Last Message", show=True),
+        Binding("s,S,ctrl+s", "send_message", "send Message", show=True),
     ]
 
     def action_save_and_quit(self):
@@ -198,7 +200,7 @@ class ChatListView(ListView):
         """
         self.post_message(SaveAndQuitMessage())
 
-    def action_focus_textarea(self):
+    def action_focus_chattextarea(self):
         """
         Triggers the focus textarea event
         """
@@ -222,10 +224,19 @@ class ChatListView(ListView):
         """
         self.index = len(self.children) - 1
 
+    def action_send_message(self):
+        """
+        Send message (content from ChatTextArea)
+        """
+        dummy = Button(id="send-input-button")
+        self.post_message(Button.Pressed(dummy))
+
 
 class ChatTextArea(TextArea):
     BINDINGS = [
         Binding("escape", "exit_insert", "Exit insert", show=True),
+        Binding("ctrl+q", "save_and_quit", "Save + Quit", show=True),
+        Binding("ctrl+s", "send_message", "Send", show=True),
     ]
 
     def action_exit_insert(self):
@@ -233,3 +244,16 @@ class ChatTextArea(TextArea):
         Exit insert "mode"
         """
         self.post_message(FocusChatContainer())
+
+    def action_save_and_quit(self):
+        """
+        Triggers the save and quit action.
+        """
+        self.post_message(SaveAndQuitMessage())
+
+    def action_send_message(self):
+        """
+        Send message (content from ChatTextArea)
+        """
+        dummy = Button(id="send-input-button")
+        self.post_message(Button.Pressed(dummy))
