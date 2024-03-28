@@ -45,6 +45,10 @@ class SidebarWidget(Widget):
         )
         yield self.container
 
+        self.container.scroll_to(
+            y=self.session_manager.get_sidebar_scrollpos(), animate=False
+        )
+
         yield Horizontal(
             Button("New chat", id="new-chat-button"),
             Button("New app", id="new-app-button"),

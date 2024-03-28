@@ -209,3 +209,10 @@ class SessionManager:
 
     def generate_message_ids(self, session_name, count=1):
         return generate_message_ids(session_name, count)
+
+    def set_sidebar_scrollpos(self, scrollpos):
+        self.sidebar_scrollpos = scrollpos
+        self.save_sessions_to_disk()
+
+    def get_sidebar_scrollpos(self):
+        return self.sidebar_scrollpos

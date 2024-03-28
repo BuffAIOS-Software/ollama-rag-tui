@@ -100,8 +100,10 @@ class ChatManager(App):
         """
         Saves the sessions and quits the application.
         """
-        current_scroll_pos = self.query_one("#chatcontainer-listview").scroll_y
-        self.session_manager.set_current_session_scrollpos(current_scroll_pos)
+        current_scroll_pos_session = self.query_one("#chatcontainer-listview").scroll_y
+        self.session_manager.set_current_session_scrollpos(current_scroll_pos_session)
+        current_scroll_pos_sidebar = self.query_one("#sidebar-listview").scroll_y
+        self.session_manager.set_sidebar_scrollpos(current_scroll_pos_sidebar)
         self.exit(0)
 
 
