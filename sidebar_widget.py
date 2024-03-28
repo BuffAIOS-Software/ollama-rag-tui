@@ -162,9 +162,9 @@ class ChatSessionListView(ListView):
         Binding("j,down", "cursor_down", "Cursor Down", show=True),
         Binding("ctrl+q", "save_and_quit", "Save + Quit", show=True),
         Binding("i", "focus_textarea", "Focus Textarea", show=True),
-        Binding("l,h", "focus_chat_container", "Focus Textarea", show=True),
-        Binding("0,g", "focus_first_element", "Cursor Down", show=True),
-        Binding("G", "focus_last_element", "Cursor Down", show=True),
+        Binding("l,h", "focus_chat_container", "Focus Chat", show=True),
+        Binding("0,g", "focus_first_element", "First Session", show=True),
+        Binding("G", "focus_last_element", "Last Session", show=True),
     ]
 
     def action_save_and_quit(self):

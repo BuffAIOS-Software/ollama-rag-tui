@@ -6,7 +6,7 @@ from textual.widget import Widget
 import asyncio
 from textual.binding import Binding, BindingType
 
-from chat_message_event import SaveAndQuitMessage
+from chat_message_event import SaveAndQuitMessage, FocusTextArea, FocusSidebar
 
 
 class ChatContainerWidget(Widget):
@@ -176,10 +176,14 @@ class ChatListView(ListView):
     """
 
     BINDINGS: list[BindingType] = [
-        Binding("up", "cursor_up", "Cursor Up", show=True),
-        Binding("down", "cursor_down", "Cursor Down", show=True),
-        Binding("ctrl+z", "suspend_process", "Suspend", show=True),
+        Binding("enter", "select_cursor", "Select", show=True),
+        Binding("k,up", "cursor_up", "Cursor Up", show=True),
+        Binding("j,down", "cursor_down", "Cursor Down", show=True),
         Binding("ctrl+q", "save_and_quit", "Save + Quit", show=True),
+        Binding("i", "focus_textarea", "Focus Textarea", show=True),
+        Binding("l,h", "focus_sidebar", "Focus Sidebar", show=True),
+        Binding("0,g", "focus_first_element", "First Message", show=True),
+        Binding("G", "focus_last_element", "Last Message", show=True),
     ]
 
     def action_save_and_quit(self):
@@ -187,3 +191,27 @@ class ChatListView(ListView):
         Triggers the save and quit action.
         """
         self.post_message(SaveAndQuitMessage())
+
+    def action_focus_textarea(self):
+        """
+        Triggers the focus textarea event
+        """
+        self.post_message(FocusTextArea())
+
+    def action_focus_sidebar(self):
+        """
+        Triggers the focus on the sidebar event
+        """
+        self.post_message(FocusSidebar())
+
+    def action_focus_first_element(self):
+        """
+        Focus the first element in the list
+        """
+        self.index = 0
+
+    def action_focus_last_element(self):
+        """
+        Focus the first element in the list
+        """
+        self.index = len(self.children) - 1

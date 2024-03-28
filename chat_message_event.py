@@ -11,3 +11,7 @@ class FocusTextArea(Message):
 
 class FocusChatContainer(Message):
     pass
+
+
+class FocusSidebar(Message):
+    pass

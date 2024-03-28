@@ -12,7 +12,12 @@ from chat_container_widget import ChatContainerWidget
 from new_chat_session_screen import NewChatSessionScreen
 from new_chat_app_screen import NewChatAppScreen
 from session_manager import SessionManager
-from chat_message_event import FocusTextArea, FocusChatContainer, SaveAndQuitMessage
+from chat_message_event import (
+    FocusTextArea,
+    FocusChatContainer,
+    SaveAndQuitMessage,
+    FocusSidebar,
+)
 
 
 class ChatManager(App):
@@ -120,6 +125,13 @@ class ChatManager(App):
         Focus the chat container
         """
         self.query_one("#chatcontainer-listview").focus()
+
+    @on(FocusSidebar)
+    def focus_sidebar(self):
+        """
+        Focus the chat container
+        """
+        self.query_one("#sidebar-listview").focus()
 
 
 if __name__ == "__main__":
